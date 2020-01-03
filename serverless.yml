@@ -1,0 +1,27 @@
+
+service: gifmaker
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - S3:PutObject
+        - S3:GetObject
+      Resource: "arn:aws:s3:::${self:custom.bucket}/*"
+
+functions:
+  gifmaker:
+    handler: handler.gifmaker
+    events:
+      - s3: gifmakerbucket
+    layers:
+      - {Ref: FfmpegLambdaLayer}
+
+layers:
+  ffmpeg:
+    path: layer
+
+custom:
+  bucket: gifmakerbucket
